@@ -1,0 +1,9 @@
+file_encryptor
+calgary*
+oprofile_data*/
+*.opreport
+*_test
+*.out
+*.enc
+*.gold
+tiny*

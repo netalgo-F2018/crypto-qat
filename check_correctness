@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -euo pipefail
+
+APP_BIN=./file_encryptor
+REF_BIN=./file_encryptor_ref
+
+test -f $APP_BIN || make
+test -f $REF_BIN || git checkout -- file_encryptor_ref
+
+# Gen tiny workload
+test -f tinytest || echo -n THIS IS TEST STRING > tinytest
+# Gen gold
+$REF_BIN -t 1 -w tinytest.enc.gold tinytest
+# Gen yours
+$APP_BIN -t 1 -w tinytest.enc.your tinytest
+
+gold_hash=$(sha1sum tinytest.enc.gold | awk '{ print $1 }')
+your_hash=$(sha1sum tinytest.enc.your | awk '{ print $1 }')
+
+[[ "$gold_hash" == "$your_hash" ]] && echo -e "\nTest pass!" || echo -e "\nTest failed!"
+
+rm -f tinytest*
+
+exit 0
