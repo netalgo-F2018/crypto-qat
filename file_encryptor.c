@@ -248,11 +248,7 @@ CpaStatus qatAes256EcbEnc(char *src, unsigned int srcLen, char *dst,
     qatAes256EcbSessionInit(sess, isEnc);
 
     // Perform Cipher operation (sync / async / batch, etc.)
-    RunTime *rt = (RunTime *)calloc(1, sizeof(RunTime));
-    gettimeofday(&rt->timeS, NULL);
     rc = cipherPerformOp(sess->cyInstHandle, sess->ctx, src, srcLen, dst, dstLen);
-    gettimeofday(&rt->timeE, NULL);
-    runTimePush(rt);
 
     // Wait for inflight requests before free resources
     symSessionWaitForInflightReq(sess->ctx);
@@ -348,6 +344,10 @@ void doEncryptFile(CmdlineArgs *cmdlineArgs)
         args[i].nrThread = cmdlineArgs->nrThread;
         args[i].threadId = i;
     }
+    
+    // \begin timer
+    RunTime *rt = (RunTime *)calloc(1, sizeof(RunTime));
+    gettimeofday(&rt->timeS, NULL);
 
     // Fire up all threads. Note that nrThread-1 pthreads are created and the
     // main thread is used as a worker as well
@@ -359,6 +359,10 @@ void doEncryptFile(CmdlineArgs *cmdlineArgs)
     // Wait for worker threads to complete
     for (int i = 1; i < cmdlineArgs->nrThread; i++)
         pthread_join(workers[i], NULL);
+
+    gettimeofday(&rt->timeE, NULL);
+    runTimePush(rt);
+    // \end timer
 
     // Show throughput
     showStats(gRunTimeHead, totalInBytes);
