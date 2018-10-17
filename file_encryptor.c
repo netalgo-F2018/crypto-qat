@@ -97,8 +97,8 @@ void showStats(RunTime *pHead, unsigned int totalBytes)
     double usDiff         = 0;
 
     for (RunTime *pCurr = pHead; pCurr != NULL; pCurr = pCurr->next) {
-        usBegin = pCurr->timeS.tv_sec * 1e6 + pCurr->timeS.tv_sec;
-        usEnd   = pCurr->timeE.tv_sec * 1e6 + pCurr->timeE.tv_sec;
+        usBegin = pCurr->timeS.tv_sec * 1e6 + pCurr->timeS.tv_usec;
+        usEnd   = pCurr->timeE.tv_sec * 1e6 + pCurr->timeE.tv_usec;
         usDiff  += (usEnd - usBegin);
     }
 
